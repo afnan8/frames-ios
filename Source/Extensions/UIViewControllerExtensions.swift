@@ -2,7 +2,7 @@ import Foundation
 import UIKit
 
 extension UIViewController {
-
+    
     @objc func scrollViewOnKeyboardWillShow(notification: NSNotification,
                                             scrollView: UIScrollView,
                                             activeField: UITextField?) {
@@ -14,10 +14,10 @@ extension UIViewController {
                                              left: 0.0,
                                              bottom: keyboardSize.height + additionalSpace,
                                              right: 0.0)
-
+            
             scrollView.contentInset = contentInsets
             scrollView.scrollIndicatorInsets = contentInsets
-
+            
             // If active text field is hidden by keyboard, scroll it so it's visible
             // Your app might not need or want this behavior.
             var aRect: CGRect = self.view.frame
@@ -29,13 +29,13 @@ extension UIViewController {
             }
         }
     }
-
+    
     @objc func scrollViewOnKeyboardWillHide(notification: NSNotification, scrollView: UIScrollView) {
         let contentInsets = UIEdgeInsets.zero
         scrollView.contentInset = contentInsets
         scrollView.scrollIndicatorInsets = contentInsets
     }
-
+    
     func registerKeyboardHandlers(notificationCenter: NotificationCenter,
                                   keyboardWillShow: Selector,
                                   keyboardWillHide: Selector) {
@@ -48,9 +48,23 @@ extension UIViewController {
                                        name: UIResponder.keyboardWillHideNotification,
                                        object: nil)
     }
-
+    
     func deregisterKeyboardHandlers(notificationCenter: NotificationCenter) {
         notificationCenter.removeObserver(self, name: UIResponder.keyboardWillShowNotification, object: nil)
         notificationCenter.removeObserver(self, name: UIResponder.keyboardWillHideNotification, object: nil)
+    }
+    
+    var isModal: Bool {
+        if let index = navigationController?.viewControllers.firstIndex(of: self), index > 0 {
+            return false
+        } else if presentingViewController != nil {
+            return true
+        } else if navigationController?.presentingViewController?.presentedViewController == navigationController {
+            return true
+        } else if tabBarController?.presentingViewController is UITabBarController {
+            return true
+        } else {
+            return false
+        }
     }
 }
